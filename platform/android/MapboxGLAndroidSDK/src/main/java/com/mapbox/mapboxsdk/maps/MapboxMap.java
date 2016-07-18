@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
 import android.location.Location;
 import android.os.SystemClock;
 import android.support.annotation.FloatRange;
@@ -19,6 +20,7 @@ import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
+import com.mapbox.mapboxsdk.annotations.Feature;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
@@ -1655,6 +1657,14 @@ public class MapboxMap {
     @UiThread
     public void snapshot(@NonNull SnapshotReadyCallback callback) {
         mMapView.snapshot(callback, null);
+    }
+
+    //
+    // featuresAt
+    //
+
+    public List<Feature> getVisibleFeatures(PointF pointF){
+        return new ArrayList<>();
     }
 
     //
