@@ -4,7 +4,7 @@ import android.graphics.RectF;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-public interface Overlay extends Annotation {
+public interface Overlay extends AnnotationDefinition {
 
     LatLng getCoordinate();
 

@@ -6,7 +6,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
- * Annotation is an overlay on top of a {@link MapView},
+ * AnnotationDefinition is an overlay on top of a {@link MapView},
  * from which {@link Polygon}, {@link Polyline} and {@link Marker} are derived.
  * <p>
  * it manages attachment to a map and identification, but does not require

@@ -1,4 +1,5 @@
 package com.mapbox.mapboxsdk.annotationsrework;
 
-public class Polygon {
+public class Polygon extends MultiShape{
+
 }

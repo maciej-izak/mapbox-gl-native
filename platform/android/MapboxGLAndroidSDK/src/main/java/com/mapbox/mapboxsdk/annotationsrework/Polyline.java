@@ -1,4 +1,5 @@
 package com.mapbox.mapboxsdk.annotationsrework;
 
-public class Polyline extends MultiPoint{
+public class Polyline extends MultiShape{
+
 }
