@@ -15,6 +15,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -62,6 +63,7 @@ import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
+import com.mapbox.mapboxsdk.annotations.Feature;
 import com.mapbox.mapboxsdk.annotations.Shape;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
@@ -1353,6 +1355,14 @@ public class MapView extends FrameLayout {
 
         return mNativeMapView.getScale();
     }
+    List<Feature> getVisibleFeatures(PointF pointF, List<String> layerIds) {
+        if (mDestroyed) {
+            return new ArrayList<>();
+        }
+
+        return mNativeMapView.getVisibleFeatures(pointF.x, pointF.y, layerIds);
+    }
+
 
     // This class handles TextureView callbacks
     private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {

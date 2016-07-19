@@ -1085,6 +1085,17 @@ void nativeRemoveCustomLayer(JNIEnv *env, jni::jobject* obj, jlong nativeMapView
     nativeMapView->getMap().removeLayer(std_string_from_jstring(env, id));
 }
 
+jni::jobject*  nativeGetVisibleFeatures(JNIEnv *env, jni::jobject* obj, jlong nativeMapViewPtr, jfloat x, jfloat y, jobjectArray stringArray){
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetVisibleFeatures");
+    assert(nativeMapViewPtr != 0);
+    NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
+    mbgl::optional<std::vector<std::string>> optionalLayerIDs;
+    std::vector<mbgl::Feature> features = nativeMapView->getMap().queryRenderedFeatures(mbgl::ScreenCoordinate(x, y), optionalLayerIDs);
+    mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetVisibleFeatures 2: "+std::to_string(features.size()));
+    mbgl::LatLng latLng = nativeMapView->getMap().latLngForPixel(mbgl::ScreenCoordinate(x, y));
+    return &jni::NewObject(*env, *latLngClass, *latLngConstructorId, latLng.latitude, latLng.longitude);
+}
+
 // Offline calls begin
 
 jlong createDefaultFileSource(JNIEnv *env, jni::jobject* obj, jni::jstring* cachePath_, jni::jstring* assetRoot_, jlong maximumCacheSize) {
@@ -1699,7 +1710,8 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeFlyTo, "(JDDDJDD)V"),
         MAKE_NATIVE_METHOD(nativeAddCustomLayer, "(JLcom/mapbox/mapboxsdk/layers/CustomLayer;Ljava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeRemoveCustomLayer, "(JLjava/lang/String;)V"),
-        MAKE_NATIVE_METHOD(nativeSetContentPadding, "(JDDDD)V")
+        MAKE_NATIVE_METHOD(nativeSetContentPadding, "(JDDDD)V"),
+        MAKE_NATIVE_METHOD(nativeGetVisibleFeatures,"(JFF[Ljava/lang/String;)Lcom/mapbox/mapboxsdk/geometry/LatLng;")
     );
 
     // Offline begin

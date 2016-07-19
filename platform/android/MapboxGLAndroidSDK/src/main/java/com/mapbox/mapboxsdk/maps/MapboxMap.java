@@ -1719,7 +1719,11 @@ public class MapboxMap {
     //
 
     public List<Feature> getVisibleFeatures(PointF pointF) {
-        return new ArrayList<>();
+        return getVisibleFeatures(pointF, new ArrayList<String>());
+    }
+
+    public List<Feature> getVisibleFeatures(PointF pointF, List<String> layerIds) {
+        return mMapView.getVisibleFeatures(pointF, layerIds);
     }
 
     //

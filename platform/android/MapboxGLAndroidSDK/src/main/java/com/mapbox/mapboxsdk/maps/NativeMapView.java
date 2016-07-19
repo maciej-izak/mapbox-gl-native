@@ -7,6 +7,7 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.view.Surface;
 
+import com.mapbox.mapboxsdk.annotations.Feature;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -17,6 +18,7 @@ import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.layers.CustomLayer;
 import com.mapbox.mapboxsdk.offline.OfflineManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Class that wraps the native methods for convenience
@@ -470,6 +472,11 @@ final class NativeMapView {
         return nativeGetCameraValues(mNativeMapViewPtr);
     }
 
+    public List<Feature> getVisibleFeatures(float x, float y, List<String> layerIds) {
+        nativeGetVisibleFeatures(mNativeMapViewPtr, x, y, layerIds.toArray(new String[layerIds.size()]));
+        return new ArrayList<>();
+    }
+
     //
     // Callbacks
     //
@@ -645,4 +652,6 @@ final class NativeMapView {
     private native void nativeRemoveCustomLayer(long nativeMapViewPtr, String id);
 
     private native double[] nativeGetCameraValues(long mNativeMapViewPtr);
+
+    private native LatLng nativeGetVisibleFeatures(long mNativeMapViewPtr, float x, float y, String[] layerIds);
 }
