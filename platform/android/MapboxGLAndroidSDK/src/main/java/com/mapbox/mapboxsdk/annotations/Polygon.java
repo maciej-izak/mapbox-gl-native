@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Polygon is a geometry annotation that's a closed loop of coordinates.
  */
-public final class Polygon extends MultiPoint {
+public final class Polygon extends PointCollectionShape {
 
     private int fillColor = Color.BLACK; // default fillColor is black
     private int strokeColor = Color.BLACK; // default strokeColor is black

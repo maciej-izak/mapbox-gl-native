@@ -13,7 +13,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
  * content to be placed at a geographical point.
  * </p>
  */
-public abstract class Annotation implements Comparable<Annotation> {
+public abstract class Shape implements AnnotationDefinition, Comparable<Shape> {
 
     /**
      * <p>
@@ -25,7 +25,7 @@ public abstract class Annotation implements Comparable<Annotation> {
     protected MapboxMap mapboxMap;
     protected MapView mapView;
 
-    protected Annotation() {
+    protected Shape() {
     }
 
     /**
@@ -86,7 +86,7 @@ public abstract class Annotation implements Comparable<Annotation> {
     }
 
     @Override
-    public int compareTo(@NonNull Annotation annotation) {
+    public int compareTo(@NonNull Shape annotation) {
         if (id < annotation.getId()) {
             return 1;
         } else if (id > annotation.getId()) {
@@ -98,8 +98,8 @@ public abstract class Annotation implements Comparable<Annotation> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || !(o instanceof Annotation)) return false;
-        Annotation that = (Annotation) o;
+        if (o == null || !(o instanceof Shape)) return false;
+        Shape that = (Shape) o;
         return id == that.getId();
     }
 

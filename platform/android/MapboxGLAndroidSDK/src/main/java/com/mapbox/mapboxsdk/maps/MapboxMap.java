@@ -17,10 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
-import com.mapbox.mapboxsdk.annotations.Annotation;
+import com.mapbox.mapboxsdk.annotations.AnnotationDefinition;
+import com.mapbox.mapboxsdk.annotations.Feature;
+import com.mapbox.mapboxsdk.annotations.Shape;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
-import com.mapbox.mapboxsdk.annotations.Feature;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
@@ -66,7 +67,7 @@ public class MapboxMap {
     private Projection mProjection;
     private CameraPosition mCameraPosition;
     private boolean mInvalidCameraPosition;
-    private LongSparseArray<Annotation> mAnnotations;
+    private LongSparseArray<Shape> mAnnotations;
 
     private List<Marker> mSelectedMarkers;
     private MarkerViewManager mMarkerViewManager;
@@ -777,6 +778,10 @@ public class MapboxMap {
         }
     }
 
+    public void addAnnotations(List<AnnotationDefinition>annotations){
+      // TODO implementation
+    }
+
     /**
      * Adds a polyline to this map.
      *
@@ -948,7 +953,7 @@ public class MapboxMap {
      * @param annotation The annotation object to remove.
      */
     @UiThread
-    public void removeAnnotation(@NonNull Annotation annotation) {
+    public void removeAnnotation(@NonNull Shape annotation) {
         if (annotation instanceof Marker) {
             Marker marker = (Marker) annotation;
             marker.hideInfoWindow();
@@ -978,11 +983,11 @@ public class MapboxMap {
      * @param annotationList A list of annotation objects to remove.
      */
     @UiThread
-    public void removeAnnotations(@NonNull List<? extends Annotation> annotationList) {
+    public void removeAnnotations(@NonNull List<? extends Shape> annotationList) {
         int count = annotationList.size();
         long[] ids = new long[count];
         for (int i = 0; i < count; i++) {
-            Annotation annotation = annotationList.get(i);
+            Shape annotation = annotationList.get(i);
             if (annotation instanceof Marker) {
                 Marker marker = (Marker) annotation;
                 marker.hideInfoWindow();
@@ -1003,7 +1008,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeAnnotations() {
-        Annotation annotation;
+        Shape annotation;
         int count = mAnnotations.size();
         long[] ids = new long[count];
         for (int i = 0; i < count; i++) {
@@ -1035,7 +1040,7 @@ public class MapboxMap {
      * @return An annotation with a matched id, null is returned if no match was found.
      */
     @Nullable
-    public Annotation getAnnotation(long id) {
+    public Shape getAnnotation(long id) {
         return mAnnotations.get(id);
     }
 
@@ -1046,8 +1051,8 @@ public class MapboxMap {
      * list will not update the map.
      */
     @NonNull
-    public List<Annotation> getAnnotations() {
-        List<Annotation> annotations = new ArrayList<>();
+    public List<Shape> getAnnotations() {
+        List<Shape> annotations = new ArrayList<>();
         for (int i = 0; i < mAnnotations.size(); i++) {
             annotations.add(mAnnotations.get(mAnnotations.keyAt(i)));
         }
@@ -1063,7 +1068,7 @@ public class MapboxMap {
     @NonNull
     public List<Marker> getMarkers() {
         List<Marker> markers = new ArrayList<>();
-        Annotation annotation;
+        Shape annotation;
         for (int i = 0; i < mAnnotations.size(); i++) {
             annotation = mAnnotations.get(mAnnotations.keyAt(i));
             if (annotation instanceof Marker) {
@@ -1082,7 +1087,7 @@ public class MapboxMap {
     @NonNull
     public List<Polygon> getPolygons() {
         List<Polygon> polygons = new ArrayList<>();
-        Annotation annotation;
+        Shape annotation;
         for (int i = 0; i < mAnnotations.size(); i++) {
             annotation = mAnnotations.get(mAnnotations.keyAt(i));
             if (annotation instanceof Polygon) {
@@ -1101,7 +1106,7 @@ public class MapboxMap {
     @NonNull
     public List<Polyline> getPolylines() {
         List<Polyline> polylines = new ArrayList<>();
-        Annotation annotation;
+        Shape annotation;
         for (int i = 0; i < mAnnotations.size(); i++) {
             annotation = mAnnotations.get(mAnnotations.keyAt(i));
             if (annotation instanceof Polyline) {
