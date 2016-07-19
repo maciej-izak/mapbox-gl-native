@@ -10,7 +10,7 @@ public final class Polyline extends PointCollectionShape {
     private int color = Color.BLACK; // default color is black
     private float width = 10; // As specified by Google API Docs (in pixels)
 
-    Polyline() {
+    public Polyline() {
         super();
     }
 

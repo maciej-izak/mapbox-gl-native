@@ -15,11 +15,11 @@ import java.util.Map;
  *
  * @link com.mapbox.mapboxsdk.maps.MapboxMap#getVisibleFeatures(PointF)}
  * and related methods.Each feature object associates a shape with an identifier and
- * attributes as specified by the source.Like ordinary AnnotationDefinition objects,some kinds of `Feature`
+ * attributes as specified by the source.Like ordinary Annotation objects,some kinds of `Feature`
  * objects can also be added to a map view using `-[MGLMapView addAnnotations:]`
  * and related methods.
  */
-public interface Feature extends AnnotationDefinition {
+public interface Feature extends Annotation {
 
     /**
      * A long that uniquely identifies the feature in its containing
@@ -68,3 +68,4 @@ public interface Feature extends AnnotationDefinition {
      * @return the
      */
     Object getAttribute(String key);
+}

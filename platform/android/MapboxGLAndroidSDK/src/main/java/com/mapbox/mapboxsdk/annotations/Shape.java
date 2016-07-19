@@ -6,14 +6,14 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**
- * AnnotationDefinition is an overlay on top of a {@link MapView},
+ * Annotation is an overlay on top of a {@link MapView},
  * from which {@link Polygon}, {@link Polyline} and {@link Marker} are derived.
  * <p>
  * it manages attachment to a map and identification, but does not require
  * content to be placed at a geographical point.
  * </p>
  */
-public abstract class Shape implements AnnotationDefinition, Comparable<Shape> {
+public abstract class Shape implements Annotation, Comparable<Shape> {
 
     /**
      * <p>
@@ -35,6 +35,7 @@ public abstract class Shape implements AnnotationDefinition, Comparable<Shape> {
      * This ID is unique for a MapView instance and is suitable for associating your own extra
      * data with.
      */
+    @Override
     public long getId() {
         return id;
     }
@@ -49,6 +50,7 @@ public abstract class Shape implements AnnotationDefinition, Comparable<Shape> {
     /**
      * Do not use this method. Used internally by the SDK.
      */
+    @Override
     public void setId(long id) {
         this.id = id;
     }

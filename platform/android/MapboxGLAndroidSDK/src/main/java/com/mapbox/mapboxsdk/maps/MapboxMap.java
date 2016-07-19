@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
-import com.mapbox.mapboxsdk.annotations.AnnotationDefinition;
+import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.Feature;
 import com.mapbox.mapboxsdk.annotations.Shape;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
@@ -652,13 +652,66 @@ public class MapboxMap {
         mMapView.setTilt(tilt);
     }
 
+    /**
+     * Adds an annotation to the map view.
+     * <p>
+     * {@link com.mapbox.mapboxsdk.annotations.MultiPolyline}, {@link com.mapbox.mapboxsdk.annotations.MultiPolygon}
+     * and {@link com.mapbox.mapboxsdk.annotations.ShapeCollection} objects cannot be added to the map view at this time.
+     * Nor can {@link Shape} objects that are not instances of {@link Polyline} or {@link Polygon) or {@link Marker}. Any
+     * multipoint, multipolyline, multipolygon, or shape collection object that is specified is silently ignored.
+     * </p>
+     *
+     * @param annotation The annotation object to add to the receiver. This object
+     *                   must conform to the `Annotation` protocol. The map view retains the
+     *                   annotation object.
+     */
+    public Annotation addAnnotation(@NonNull Annotation annotation) {
+
+        // validate if annotation is already added
+        if (annotation.getId() != -1) {
+            removeAnnotation(annotation);
+        }
+
+        if (annotation instanceof Marker) {
+            long id = mMapView.addMarker((Marker) annotation);
+            annotation.setId(id);
+        } else if (annotation instanceof Polygon) {
+            long id = mMapView.addPolygon((Polygon) annotation);
+            annotation.setId(id);
+        } else if (annotation instanceof Polyline) {
+            long id = mMapView.addPolyline((Polyline) annotation);
+            annotation.setId(id);
+        } else {
+            Log.v(MapboxConstants.TAG, "Unsupported annotation type for addAnnotation");
+        }
+        return annotation;
+    }
 
     /**
+     * Adds an array of annotations to the map view.
      * <p>
-     * Adds a marker to this map.
+     * {@link com.mapbox.mapboxsdk.annotations.MultiPolyline}, {@link com.mapbox.mapboxsdk.annotations.MultiPolygon}
+     * and {@link com.mapbox.mapboxsdk.annotations.ShapeCollection} objects cannot be added to the map view at this time.
+     * Nor can {@link Shape} objects that are not instances of {@link Polyline} or {@link Polygon) or {@link Marker}. Any
+     * multipoint, multipolyline, multipolygon, or shape collection object that is specified is silently ignored.
      * </p>
+     *
+     * @param annotations An List of annotation objects. Each object in the list
+     *                    must conform to the `Annotation` protocol. The map view retains each
+     *                    individual annotation object.
+     */
+    public void addAnnotations(List<Annotation> annotations) {
+        for (Annotation a : annotations) {
+            addAnnotation(a);
+        }
+    }
+
+    /**
+     * Adds a marker to this map.
+     * <p>
      * The marker's icon is rendered on the map at the location {@code Marker.position}.
      * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
+     * </p>
      *
      * @param markerOptions A marker options object that defines how to render the marker.
      * @return The {@code Marker} that was added to the map.
@@ -670,11 +723,11 @@ public class MapboxMap {
     }
 
     /**
-     * <p>
      * Adds a marker to this map.
-     * </p>
+     * <p>
      * The marker's icon is rendered on the map at the location {@code Marker.position}.
      * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
+     * </p>
      *
      * @param markerOptions A marker options object that defines how to render the marker.
      * @return The {@code Marker} that was added to the map.
@@ -776,10 +829,6 @@ public class MapboxMap {
         if (index > -1) {
             mAnnotations.setValueAt(index, updatedMarker);
         }
-    }
-
-    public void addAnnotations(List<AnnotationDefinition>annotations){
-      // TODO implementation
     }
 
     /**
@@ -953,17 +1002,19 @@ public class MapboxMap {
      * @param annotation The annotation object to remove.
      */
     @UiThread
-    public void removeAnnotation(@NonNull Shape annotation) {
-        if (annotation instanceof Marker) {
-            Marker marker = (Marker) annotation;
-            marker.hideInfoWindow();
-            if (marker instanceof MarkerView) {
-                mMarkerViewManager.removeMarkerView((MarkerView) marker);
+    public void removeAnnotation(Annotation annotation) {
+        if (annotation != null) {
+            if (annotation instanceof Marker) {
+                Marker marker = (Marker) annotation;
+                marker.hideInfoWindow();
+                if (marker instanceof MarkerView) {
+                    mMarkerViewManager.removeMarkerView((MarkerView) marker);
+                }
             }
+            long id = annotation.getId();
+            mMapView.removeAnnotation(id);
+            mAnnotations.remove(id);
         }
-        long id = annotation.getId();
-        mMapView.removeAnnotation(id);
-        mAnnotations.remove(id);
     }
 
     /**
@@ -973,8 +1024,7 @@ public class MapboxMap {
      */
     @UiThread
     public void removeAnnotation(long id) {
-        mMapView.removeAnnotation(id);
-        mAnnotations.remove(id);
+        removeAnnotation(getAnnotation(id));
     }
 
     /**
@@ -1668,7 +1718,7 @@ public class MapboxMap {
     // featuresAt
     //
 
-    public List<Feature> getVisibleFeatures(PointF pointF){
+    public List<Feature> getVisibleFeatures(PointF pointF) {
         return new ArrayList<>();
     }
 

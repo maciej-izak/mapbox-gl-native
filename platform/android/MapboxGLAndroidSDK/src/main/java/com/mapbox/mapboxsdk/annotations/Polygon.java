@@ -15,7 +15,7 @@ public final class Polygon extends PointCollectionShape {
     private int fillColor = Color.BLACK; // default fillColor is black
     private int strokeColor = Color.BLACK; // default strokeColor is black
 
-    Polygon() {
+    public Polygon() {
         super();
     }
 
