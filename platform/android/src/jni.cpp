@@ -163,6 +163,10 @@ jni::jmethodID* offlineRegionDeleteOnErrorId = nullptr;
 jni::jclass* polygonFeatureClass = nullptr;
 jni::jmethodID* polygonFeatureConstructorId = nullptr;
 
+jni::jclass* featureWrapperClass = nullptr;
+jni::jmethodID* featureWrapperConstructorId = nullptr;
+jni::jmethodID* featureWrapperAddId = nullptr;
+
 // Offline declarations end
 
 bool attach_jni_thread(JavaVM* vm, JNIEnv** env, std::string threadName) {
@@ -1097,10 +1101,12 @@ jni::jobject*  nativeGetVisibleFeatures(JNIEnv *env, jni::jobject* obj, jlong na
     assert(nativeMapViewPtr != 0);
     NativeMapView *nativeMapView = reinterpret_cast<NativeMapView *>(nativeMapViewPtr);
     mbgl::optional<std::vector<std::string>> optionalLayerIDs;
-    std::vector<mbgl::Feature> features = nativeMapView->getMap().queryRenderedFeatures(mbgl::ScreenCoordinate(x, y), optionalLayerIDs);
+  x  std::vector<mbgl::Feature> features = nativeMapView->getMap().queryRenderedFeatures(mbgl::ScreenCoordinate(x, y), optionalLayerIDs);
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetVisibleFeatures 2: "+std::to_string(features.size()));
 
-    jni::jobject* joutput;
+    // create FeatureWrapper return type
+    jni::jobject* joutput = &jni::NewObject(*env, *featureWrapperClass, *featureWrapperConstructorId);
+
     //jni::jobject* jhashmap = &jni::NewObject(*env, *mapClass, *mapConstructorId);
     mbgl::ToFeatureType toFeatureType;
     for (const auto &feature : features) {
@@ -1110,7 +1116,7 @@ jni::jobject*  nativeGetVisibleFeatures(JNIEnv *env, jni::jobject* obj, jlong na
         }else if(featureType==mbgl::FeatureType::LineString) {
            mbgl::Log::Debug(mbgl::Event::JNI, "It's a polyline");
         }else if(featureType==mbgl::FeatureType::Polygon) {
-           joutput = &jni::NewObject(*env, *polygonFeatureClass, *polygonFeatureConstructorId);
+           jni::CallMethod<void>(*env, joutput, *featureWrapperAddId,&jni::NewObject(*env, *polygonFeatureClass, *polygonFeatureConstructorId));
            mbgl::Log::Debug(mbgl::Event::JNI, "It's a polygon");
         }else{
            mbgl::Log::Debug(mbgl::Event::JNI, "Unsupported feature type found!");
@@ -1662,6 +1668,11 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     polygonFeatureClass = jni::NewGlobalRef(env, polygonFeatureClass).release();
     polygonFeatureConstructorId = &jni::GetMethodID(env, *polygonFeatureClass, "<init>", "()V");
 
+    featureWrapperClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/annotations/FeatureWrapper");
+    featureWrapperClass = jni::NewGlobalRef(env, featureWrapperClass).release();
+    featureWrapperConstructorId = &jni::GetMethodID(env, *featureWrapperClass, "<init>", "()V");;
+    featureWrapperAddId = &jni::GetMethodID(env, *featureWrapperClass,"add", "(Lcom/mapbox/mapboxsdk/annotations/Feature;)V");
+
     jni::jclass& nativeMapViewClass = jni::FindClass(env, "com/mapbox/mapboxsdk/maps/NativeMapView");
 
     onInvalidateId = &jni::GetMethodID(env, nativeMapViewClass, "onInvalidate", "()V");
@@ -1743,7 +1754,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeAddCustomLayer, "(JLcom/mapbox/mapboxsdk/layers/CustomLayer;Ljava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeRemoveCustomLayer, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeSetContentPadding, "(JDDDD)V"),
-        MAKE_NATIVE_METHOD(nativeGetVisibleFeatures,"(JFF[Ljava/lang/String;)Lcom/mapbox/mapboxsdk/annotations/PolygonFeature;")
+        MAKE_NATIVE_METHOD(nativeGetVisibleFeatures,"(JFF[Ljava/lang/String;)Lcom/mapbox/mapboxsdk/annotations/FeatureWrapper;")
     );
 
     // Offline begin

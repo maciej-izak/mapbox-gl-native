@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.mapbox.mapboxsdk.annotations.Feature;
+import com.mapbox.mapboxsdk.annotations.FeatureWrapper;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -657,5 +658,5 @@ final class NativeMapView {
 
     private native double[] nativeGetCameraValues(long mNativeMapViewPtr);
 
-    private native PolygonFeature nativeGetVisibleFeatures(long mNativeMapViewPtr, float x, float y, String[] layerIds);
+    private native FeatureWrapper nativeGetVisibleFeatures(long mNativeMapViewPtr, float x, float y, String[] layerIds);
 }

@@ -11,7 +11,8 @@ public class FeatureWrapper {
         features = new ArrayList<>();
     }
 
-    public void setFeatures(List<Feature>features){
-        this.features = features;
+    public void add(Feature feature){
+        features.add(feature);
     }
+
 }
