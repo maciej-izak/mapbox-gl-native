@@ -477,8 +477,8 @@ final class NativeMapView {
     }
 
     public List<Feature> getVisibleFeatures(float x, float y, List<String> layerIds) {
-        PolygonFeature polygonFeature = nativeGetVisibleFeatures(mNativeMapViewPtr, x, y, layerIds.toArray(new String[layerIds.size()]));
-        Log.v(MapboxConstants.TAG,polygonFeature.toString());
+        FeatureWrapper wrapper = nativeGetVisibleFeatures(mNativeMapViewPtr, x, y, layerIds.toArray(new String[layerIds.size()]));
+        Log.v(MapboxConstants.TAG,wrapper.toString());
         return new ArrayList<>();
     }
 
