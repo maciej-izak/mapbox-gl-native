@@ -5,13 +5,16 @@ import android.content.Context;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.Build;
+import android.util.Log;
 import android.view.Surface;
 
 import com.mapbox.mapboxsdk.annotations.Feature;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
+import com.mapbox.mapboxsdk.annotations.PolygonFeature;
 import com.mapbox.mapboxsdk.annotations.Polyline;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
@@ -473,7 +476,8 @@ final class NativeMapView {
     }
 
     public List<Feature> getVisibleFeatures(float x, float y, List<String> layerIds) {
-        nativeGetVisibleFeatures(mNativeMapViewPtr, x, y, layerIds.toArray(new String[layerIds.size()]));
+        PolygonFeature polygonFeature = nativeGetVisibleFeatures(mNativeMapViewPtr, x, y, layerIds.toArray(new String[layerIds.size()]));
+        Log.v(MapboxConstants.TAG,polygonFeature.toString());
         return new ArrayList<>();
     }
 
@@ -653,5 +657,5 @@ final class NativeMapView {
 
     private native double[] nativeGetCameraValues(long mNativeMapViewPtr);
 
-    private native LatLng nativeGetVisibleFeatures(long mNativeMapViewPtr, float x, float y, String[] layerIds);
+    private native PolygonFeature nativeGetVisibleFeatures(long mNativeMapViewPtr, float x, float y, String[] layerIds);
 }

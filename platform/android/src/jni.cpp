@@ -160,6 +160,9 @@ jni::jmethodID* offlineRegionStatusOnErrorId = nullptr;
 jni::jmethodID* offlineRegionDeleteOnDeleteId = nullptr;
 jni::jmethodID* offlineRegionDeleteOnErrorId = nullptr;
 
+jni::jclass* polygonFeatureClass = nullptr;
+jni::jmethodID* polygonFeatureConstructorId = nullptr;
+
 // Offline declarations end
 
 bool attach_jni_thread(JavaVM* vm, JNIEnv** env, std::string threadName) {
@@ -1097,34 +1100,23 @@ jni::jobject*  nativeGetVisibleFeatures(JNIEnv *env, jni::jobject* obj, jlong na
     std::vector<mbgl::Feature> features = nativeMapView->getMap().queryRenderedFeatures(mbgl::ScreenCoordinate(x, y), optionalLayerIDs);
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetVisibleFeatures 2: "+std::to_string(features.size()));
 
+    jni::jobject* joutput;
     //jni::jobject* jhashmap = &jni::NewObject(*env, *mapClass, *mapConstructorId);
-
+    mbgl::ToFeatureType toFeatureType;
     for (const auto &feature : features) {
-        //for (auto &pair : feature.properties) {
-        //    auto &value = pair.second;
-        //    PropertyValueEvaluator evaluator;
-        //    jni::CallMethod<void>(*env, hashMap, *put, std_string_to_jstring(env2, pair.first.c_str(),mbgl::Value::visit(value, evaluator)));
-        //}
-        if(typeid(feature.geometry)==typeid(mbgl::Point<double>)) {
+        const mbgl::FeatureType featureType = apply_visitor(toFeatureType, feature.geometry);
+        if(featureType==mbgl::FeatureType::Point) {
             mbgl::Log::Debug(mbgl::Event::JNI, "It's a point");
-        }else if(typeid(feature.geometry)==typeid(mbgl::LineString<double>)) {
-           mbgl::Log::Debug(mbgl::Event::JNI, "It's a line");
-        }else if(typeid(feature.geometry)==typeid(mbgl::Polygon<double>)) {
+        }else if(featureType==mbgl::FeatureType::LineString) {
+           mbgl::Log::Debug(mbgl::Event::JNI, "It's a polyline");
+        }else if(featureType==mbgl::FeatureType::Polygon) {
+           joutput = &jni::NewObject(*env, *polygonFeatureClass, *polygonFeatureConstructorId);
            mbgl::Log::Debug(mbgl::Event::JNI, "It's a polygon");
-        }else if(typeid(feature.geometry)==typeid(mbgl::MultiPoint<double>)) {
-            mbgl::Log::Debug(mbgl::Event::JNI, "It's a multipoint");
-        }else if(typeid(feature.geometry)==typeid(mbgl::MultiLineString<double>)) {
-           mbgl::Log::Debug(mbgl::Event::JNI, "It's a multilinestring");
-        }else if(typeid(feature.geometry)==typeid(mbgl::MultiPolygon<double>)) {
-           mbgl::Log::Debug(mbgl::Event::JNI, "It's a mulitpolygon");
-        }else if(typeid(feature.geometry)==typeid(mapbox::geometry::geometry_collection<double>)) {
-           mbgl::Log::Debug(mbgl::Event::JNI, "It's a geometrycollecition");
         }else{
-           mbgl::Log::Debug(mbgl::Event::JNI, "It's a something else");
+           mbgl::Log::Debug(mbgl::Event::JNI, "Unsupported feature type found!");
         }
     }
-    mbgl::LatLng latLng = nativeMapView->getMap().latLngForPixel(mbgl::ScreenCoordinate(x, y));
-    return &jni::NewObject(*env, *latLngClass, *latLngConstructorId, latLng.latitude, latLng.longitude);
+    return joutput;
 }
 
 // Offline calls begin
@@ -1666,6 +1658,10 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     //mapConstructorId = &jni::GetMethodID(env, *mapClass, "<init>", "()V");
     //putFunctionId = &jni::GetMethodID(env, *mapClass, "put","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 
+    polygonFeatureClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/annotations/PolygonFeature");
+    polygonFeatureClass = jni::NewGlobalRef(env, polygonFeatureClass).release();
+    polygonFeatureConstructorId = &jni::GetMethodID(env, *polygonFeatureClass, "<init>", "()V");
+
     jni::jclass& nativeMapViewClass = jni::FindClass(env, "com/mapbox/mapboxsdk/maps/NativeMapView");
 
     onInvalidateId = &jni::GetMethodID(env, nativeMapViewClass, "onInvalidate", "()V");
@@ -1747,7 +1743,7 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         MAKE_NATIVE_METHOD(nativeAddCustomLayer, "(JLcom/mapbox/mapboxsdk/layers/CustomLayer;Ljava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeRemoveCustomLayer, "(JLjava/lang/String;)V"),
         MAKE_NATIVE_METHOD(nativeSetContentPadding, "(JDDDD)V"),
-        MAKE_NATIVE_METHOD(nativeGetVisibleFeatures,"(JFF[Ljava/lang/String;)Lcom/mapbox/mapboxsdk/geometry/LatLng;")
+        MAKE_NATIVE_METHOD(nativeGetVisibleFeatures,"(JFF[Ljava/lang/String;)Lcom/mapbox/mapboxsdk/annotations/PolygonFeature;")
     );
 
     // Offline begin
