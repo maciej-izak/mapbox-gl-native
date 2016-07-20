@@ -105,6 +105,10 @@ jni::jfieldID* customLayerInitializeFunctionId = nullptr;
 jni::jfieldID* customLayerRenderFunctionId = nullptr;
 jni::jfieldID* customLayerDeinitializeFunctionId = nullptr;
 
+//jni::jclass* mapClass = nullptr;
+//jni::jmethodID* mapConstructorId = nullptr;
+//jni::jmethodID* putFunctionId = nullptr;
+
 // Offline declarations start
 
 jni::jfieldID* offlineManagerClassPtrId = nullptr;
@@ -1092,6 +1096,33 @@ jni::jobject*  nativeGetVisibleFeatures(JNIEnv *env, jni::jobject* obj, jlong na
     mbgl::optional<std::vector<std::string>> optionalLayerIDs;
     std::vector<mbgl::Feature> features = nativeMapView->getMap().queryRenderedFeatures(mbgl::ScreenCoordinate(x, y), optionalLayerIDs);
     mbgl::Log::Debug(mbgl::Event::JNI, "nativeGetVisibleFeatures 2: "+std::to_string(features.size()));
+
+    //jni::jobject* jhashmap = &jni::NewObject(*env, *mapClass, *mapConstructorId);
+
+    for (const auto &feature : features) {
+        //for (auto &pair : feature.properties) {
+        //    auto &value = pair.second;
+        //    PropertyValueEvaluator evaluator;
+        //    jni::CallMethod<void>(*env, hashMap, *put, std_string_to_jstring(env2, pair.first.c_str(),mbgl::Value::visit(value, evaluator)));
+        //}
+        if(typeid(feature.geometry)==typeid(mbgl::Point<double>)) {
+            mbgl::Log::Debug(mbgl::Event::JNI, "It's a point");
+        }else if(typeid(feature.geometry)==typeid(mbgl::LineString<double>)) {
+           mbgl::Log::Debug(mbgl::Event::JNI, "It's a line");
+        }else if(typeid(feature.geometry)==typeid(mbgl::Polygon<double>)) {
+           mbgl::Log::Debug(mbgl::Event::JNI, "It's a polygon");
+        }else if(typeid(feature.geometry)==typeid(mbgl::MultiPoint<double>)) {
+            mbgl::Log::Debug(mbgl::Event::JNI, "It's a multipoint");
+        }else if(typeid(feature.geometry)==typeid(mbgl::MultiLineString<double>)) {
+           mbgl::Log::Debug(mbgl::Event::JNI, "It's a multilinestring");
+        }else if(typeid(feature.geometry)==typeid(mbgl::MultiPolygon<double>)) {
+           mbgl::Log::Debug(mbgl::Event::JNI, "It's a mulitpolygon");
+        }else if(typeid(feature.geometry)==typeid(mapbox::geometry::geometry_collection<double>)) {
+           mbgl::Log::Debug(mbgl::Event::JNI, "It's a geometrycollecition");
+        }else{
+           mbgl::Log::Debug(mbgl::Event::JNI, "It's a something else");
+        }
+    }
     mbgl::LatLng latLng = nativeMapView->getMap().latLngForPixel(mbgl::ScreenCoordinate(x, y));
     return &jni::NewObject(*env, *latLngClass, *latLngConstructorId, latLng.latitude, latLng.longitude);
 }
@@ -1629,6 +1660,11 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     customLayerInitializeFunctionId = &jni::GetFieldID(env, *customLayerClass, "mInitializeFunction", "J");
     customLayerRenderFunctionId = &jni::GetFieldID(env, *customLayerClass, "mRenderFunction", "J");
     customLayerDeinitializeFunctionId = &jni::GetFieldID(env, *customLayerClass, "mDeinitializeFunction", "J");
+
+    //mapClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/layers/CustomLayer");
+    //mapClass = jni::NewGlobalRef(env, mapClass).release();
+    //mapConstructorId = &jni::GetMethodID(env, *mapClass, "<init>", "()V");
+    //putFunctionId = &jni::GetMethodID(env, *mapClass, "put","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
 
     jni::jclass& nativeMapViewClass = jni::FindClass(env, "com/mapbox/mapboxsdk/maps/NativeMapView");
 
