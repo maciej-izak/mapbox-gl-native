@@ -163,8 +163,23 @@ jni::jmethodID* offlineRegionDeleteOnErrorId = nullptr;
 jni::jclass* polygonFeatureClass = nullptr;
 jni::jmethodID* polygonFeatureConstructorId = nullptr;
 
+//jni::jclass* multiPolygonFeatureClass = nullptr;
+//jni::jmethodID* multiPolygonFeatureConstructorId = nullptr;
+
 jni::jclass* polylineFeatureClass = nullptr;
 jni::jmethodID* polylineFeatureConstructorId = nullptr;
+
+//jni::jclass* multiPolylineFeatureClass = nullptr;
+//jni::jmethodID* multiPolylineFeatureConstructorId = nullptr;
+
+jni::jclass* pointFeatureClass = nullptr;
+jni::jmethodID* pointFeatureConstructorId = nullptr;
+
+//jni::jclass* multiPointFeatureClass = nullptr;
+//jni::jmethodID* multiPointFeatureConstructorId = nullptr;
+
+//jni::jclass* shapeCollectionFeatureClass = nullptr;
+//jni::jmethodID* shapeCollectionFeatureConstructorId = nullptr;
 
 jni::jclass* featureWrapperClass = nullptr;
 jni::jmethodID* featureWrapperConstructorId = nullptr;
@@ -1672,9 +1687,25 @@ extern "C" JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     polygonFeatureClass = jni::NewGlobalRef(env, polygonFeatureClass).release();
     polygonFeatureConstructorId = &jni::GetMethodID(env, *polygonFeatureClass, "<init>", "()V");
 
+    //multiPolygonFeatureClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/annotations/MultiPolygonFeature");
+    //multiPolygonFeatureClass = jni::NewGlobalRef(env, multiPolygonFeatureClass).release();
+    //multiPolygonFeatureConstructorId = &jni::GetMethodID(env, *multiPolygonFeatureClass, "<init>", "()V");
+
     polylineFeatureClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/annotations/PolylineFeature");
     polylineFeatureClass = jni::NewGlobalRef(env, polylineFeatureClass).release();
     polylineFeatureConstructorId = &jni::GetMethodID(env, *polylineFeatureClass, "<init>", "()V");
+
+    //multiPolylineFeatureClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/annotations/MultiPolylineFeature");
+    //multiPolylineFeatureClass = jni::NewGlobalRef(env, multiPolylineFeatureClass).release();
+    //multiPolylineFeatureConstructorId = &jni::GetMethodID(env, *multiPolylineFeatureClass, "<init>", "()V");
+
+    pointFeatureClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/annotations/PointFeature");
+    pointFeatureClass = jni::NewGlobalRef(env, pointFeatureClass).release();
+    pointFeatureConstructorId = &jni::GetMethodID(env, *pointFeatureClass, "<init>", "()V");
+
+    //multiPointFeatureClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/annotations/MultiPointFeature");
+    //multiPointFeatureClass = jni::NewGlobalRef(env, multiPointFeatureClass).release();
+    //multiPointFeatureConstructorId = &jni::GetMethodID(env, *multiPointFeatureClass, "<init>", "()V");
 
     featureWrapperClass = &jni::FindClass(env, "com/mapbox/mapboxsdk/annotations/FeatureWrapper");
     featureWrapperClass = jni::NewGlobalRef(env, featureWrapperClass).release();
