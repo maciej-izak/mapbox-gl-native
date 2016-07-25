@@ -1,14 +1,12 @@
 package com.mapbox.mapboxsdk.annotations;
 
-import java.util.List;
 import java.util.Map;
 
 public class MultiPolygonFeature extends MultiPolygon implements Feature{
     private long featureId;
     private Map<String, Object> attributes;
 
-    public MultiPolygonFeature(List<Polygon> polygonList) {
-        super(polygonList);
+    public MultiPolygonFeature() {
     }
 
     @Override
