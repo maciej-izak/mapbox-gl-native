@@ -3,15 +3,15 @@
 #include "value.hpp"
 
 #include <mbgl/platform/log.hpp>
-#include <mbgl/style/conversion.hpp>
+#include <mbgl/geometry/feature.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <jni/jni.hpp>
 
 namespace mbgl {
-namespace style {
-namespace conversion {
+namespace geometry {
+namespace feature {
 
 
 //XXX
@@ -90,6 +90,6 @@ inline optional<Value> toValue(const mbgl::android::Value& value) {
     }
 }
 
-} // namespace conversion
-} // namespace style
+} // namespace feature
+} // namespace geometry
 } // namespace mbgl
