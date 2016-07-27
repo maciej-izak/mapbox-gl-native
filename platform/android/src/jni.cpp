@@ -23,6 +23,8 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/run_loop.hpp>
 
+#include "feature/android_feature.hpp"
+
 #include <jni/jni.hpp>
 
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -1159,6 +1161,12 @@ jni::jobject*  nativeGetVisibleFeatures(JNIEnv *env, jni::jobject* obj, jlong na
 
         }else{
            mbgl::Log::Debug(mbgl::Event::JNI, "Unsupported feature type found!");
+        }
+
+        for (auto &pair : feature.properties) {
+           auto &value = pair.second;
+           mbgl::geometry::feature::PropertyValueEvaluator evaluator(*env);
+           mbgl::Value::visit(value, evaluator);
         }
     }
     return joutput;

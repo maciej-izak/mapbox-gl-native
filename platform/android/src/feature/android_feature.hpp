@@ -1,95 +1,86 @@
 #pragma once
 
 #include "value.hpp"
+#include "../java_types.hpp"
 
 #include <mbgl/platform/log.hpp>
-#include <mbgl/geometry/feature.hpp>
-#include <mbgl/util/feature.hpp>
+//#include <mbgl/util/feature.hpp>
 #include <mbgl/util/optional.hpp>
 
+//#include <mapbox/geometry/feature.hpp>
+
 #include <jni/jni.hpp>
+
+//XXX
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 namespace mbgl {
 namespace geometry {
 namespace feature {
 
+class PropertyValueEvaluator  {
 
-//XXX
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 
-inline bool isUndefined(const mbgl::android::Value& value) {
-    return value.isNull();
-}
+public:
 
-inline bool isArray(const mbgl::android::Value& value) {
-    return value.isArray();
-}
+    PropertyValueEvaluator(jni::JNIEnv&);
+    virtual ~PropertyValueEvaluator();
 
-inline bool isObject(const mbgl::android::Value& value) {
-    return value.isObject();
-}
-
-inline std::size_t arrayLength(const mbgl::android::Value& value) {
-    return value.getLength();;
-}
-
-inline mbgl::android::Value arrayMember(const mbgl::android::Value& value, std::size_t i) {
-    return value.get(i);
-}
-
-inline optional<mbgl::android::Value> objectMember(const mbgl::android::Value& value, const char* key) {
-    mbgl::android::Value member = value.get(key);
-
-    if (!member.isNull()) {
-        return member;
-    } else {
-        return {};
+    std::nullptr_t operator()(const std::nullptr_t &property) const {
+        mbgl::Log::Warning(mbgl::Event::Android, "PropertyEvaluator: returning null");
+        return nullptr;
     }
-}
 
-template <class Fn>
-optional<Error> eachMember(const mbgl::android::Value& value, Fn&& fn) {
-    //TODO
-    mbgl::Log::Warning(mbgl::Event::Android, "eachMember not implemented");
-    return {};
-}
-
-inline optional<bool> toBool(const mbgl::android::Value& value) {
-    if (value.isBool()) {
-        return value.toBool();
-    } else {
-        return {};
+    jboolean operator()(const bool &property) const {
+        mbgl::Log::Warning(mbgl::Event::Android, "PropertyEvaluator: converting bool to jboolean");
+        return value ? JNI_TRUE : JNI_FALSE;
     }
-}
 
-inline optional<float> toNumber(const mbgl::android::Value& value) {
-    if (value.isNumber()) {
-        return value.toNumber();
-    } else {
-        return {};
+    jlong operator()(const uint64_t &property) const {
+        mbgl::Log::Warning(mbgl::Event::Android, "PropertyEvaluator: converting uint64_t to jlong");
+        return static_cast<jlong>(property);
     }
-}
 
-inline optional<std::string> toString(const mbgl::android::Value& value) {
-    if (value.isString()) {
-        return value.toString();
-    } else {
-        return {};
+    jint operator()(const int64_t &property) const {
+        mbgl::Log::Warning(mbgl::Event::Android, "PropertyEvaluator: converting int64_t to jint");
+        return property;
     }
-}
 
-inline optional<Value> toValue(const mbgl::android::Value& value) {
-    if (value.isBool()) {
-        return { value.toBool() };
-    } else if (value.isString()) {
-        return { value.toString() };
-    } else if (value.isNumber()) {
-       return { value.toNumber() };
-    } else {
-        return {};
+    jdouble operator()(const double &property) const {
+        mbgl::Log::Warning(mbgl::Event::Android, "PropertyEvaluator: converting double to jdouble");
+        return property;
     }
-}
 
-} // namespace feature
+    jni::jstring* operator()(const std::string &property) const {
+       mbgl::Log::Warning(mbgl::Event::Android, "PropertyEvaluator: converting std::string to jstring");
+       return jni::Make<jni::String>(jenv, property).Get();
+    }
+
+    jobject operator()(const std::vector<mbgl::Value> &values) const {
+        mbgl::Log::Warning(mbgl::Event::Android, "PropertyEvaluator not implemented for list");
+        // create java list
+        //for (const auto &v : values) {
+            // add item to list while visiting this to evaluate its properties
+            //[objects addObject:mbgl::Value::visit(v, *this)];
+        //}
+        // change return with list
+        return nullptr;
+    }
+
+    jobject operator()(const std::unordered_map<std::string, mbgl::Value> &items) const {
+        mbgl::Log::Warning(mbgl::Event::Android, "PropertyEvaluator not implemented for map");
+        // create java map
+        //for (auto &item : items) {
+            // add item to map while recursively visiting its properties
+            //attributes[@(item.first.c_str())] = mbgl::Value::visit(item.second, *this);
+        //}
+        return nullptr;
+    }
+
+    jni::JNIEnv& jenv;
+    jni::jobject* value;
+};
+
+}
 } // namespace geometry
 } // namespace mbgl
