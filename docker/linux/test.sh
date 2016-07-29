@@ -20,5 +20,5 @@ cd build
 source ./scripts/travis_helper.sh
 source ./scripts/travis_setup.sh
 
-make linux
-make test
+VERBOSE=1 make node
+VERBOSE=1 make test-node

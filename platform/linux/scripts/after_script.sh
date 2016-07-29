@@ -3,6 +3,8 @@
 set -e
 set -o pipefail
 
+find mason_packages -name "mason.ini" -exec cat {} \;
+
 JOB=$1
 
 if [ ! -z "${AWS_ACCESS_KEY_ID}" ] && [ ! -z "${AWS_SECRET_ACCESS_KEY}" ] ; then

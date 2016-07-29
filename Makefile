@@ -274,7 +274,7 @@ linux: glfw-app render offline
 
 .PHONY: test
 test: $(LINUX_BUILD)
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-test
+	$(NINJA) -v -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-test
 
 ifneq (,$(shell which gdb))
   GDB = gdb -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
@@ -288,15 +288,15 @@ run-test-%: test
 
 .PHONY: render
 render: $(LINUX_BUILD)
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-render
+	$(NINJA) -v -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-render
 
 .PHONY: offline
 offline: $(LINUX_BUILD)
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-offline
+	$(NINJA) -v -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-offline
 
 .PHONY: glfw-app
 glfw-app: $(LINUX_BUILD)
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-glfw
+	$(NINJA) -v -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-glfw
 
 .PHONY: run-glfw-app
 run-glfw-app: glfw-app
@@ -304,7 +304,7 @@ run-glfw-app: glfw-app
 
 .PHONY: node
 node: $(LINUX_BUILD)
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node
+	$(NINJA) -v -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node
 
 .PHONY: compdb
 compdb: $(LINUX_BUILD)
@@ -314,7 +314,7 @@ compdb: $(LINUX_BUILD)
 clang-tools: compdb
 	if test -z $(CLANG_TIDY); then .mason/mason install clang-tidy 3.8.0; fi
 	if test -z $(CLANG_FORMAT); then .mason/mason install clang-format 3.8.0; fi
-	$(NINJA) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-headers
+	$(NINJA) -v -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-headers
 
 .PHONY: tidy
 tidy: clang-tools
